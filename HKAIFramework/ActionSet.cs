@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-
 namespace HKAIFramework
 {
     /// <summary>
@@ -11,7 +10,7 @@ namespace HKAIFramework
         /// <summary>
         /// An array of sequences whose weights and number of repeats are tracked.
         /// </summary>
-        public Tuple<ActionSequence, float, int>[] TrackedSequences;
+        public ValueTuple<ActionSequence, float, int>[] TrackedSequences;
         
         /// <summary>
         /// The current sequence being executed.

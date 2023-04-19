@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 using ReflectionHelper = Modding.ReflectionHelper;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 using Vasi;
+using HKAIFramework;
 
 namespace AnyRadiance
 {
@@ -80,7 +81,7 @@ namespace AnyRadiance
         {
             yield return null;
 
-            FindObjectsOfType<GameObject>(true).FirstOrDefault(go =>
+             FindObjectsOfType<GameObject>().FirstOrDefault(go =>
                 go.name == "Absolute Radiance" && go.layer == (int)PhysLayers.ENEMIES)?
                 .AddComponent<Radiance.Radiance>();
 
@@ -88,9 +89,9 @@ namespace AnyRadiance
             var applyMusicCue = GameObject.Find("Boss Control").LocateMyFSM("Control")
                 .GetAction<ApplyMusicCue>("Title Up");
             var musicCue = applyMusicCue.musicCue.Value as MusicCue;
-            var channelInfos = ReflectionHelper.GetField<MusicCue, MusicCue.MusicChannelInfo[]>(musicCue, "channelInfos");
-            ReflectionHelper.SetField(channelInfos[0], "clip", AnyRadiance.Instance.AudioClips["Music"]);
-            ReflectionHelper.SetField(musicCue, "channelInfos", channelInfos);
+            var channelInfos =ReflectionHelper.GetAttr<MusicCue, MusicCue.MusicChannelInfo[]>(musicCue, "channelInfos");
+            ReflectionHelper.SetAttr(channelInfos[0], "clip", AnyRadiance.Instance.AudioClips["Music"]);
+            ReflectionHelper.SetAttr(musicCue, "channelInfos", channelInfos);
             applyMusicCue.musicCue = musicCue;
         }
     }

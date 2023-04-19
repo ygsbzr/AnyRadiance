@@ -1,9 +1,9 @@
 using System;
-
+using Modding;
 namespace AnyRadiance
 {
     [Serializable]
-    public class LocalSettings
+    public class LocalSettings:ModSettings
     {
         public BossStatue.Completion Completion = new BossStatue.Completion
         {

@@ -36,7 +36,7 @@ namespace AnyRadiance.Radiance
         // dash and release it to cancel.
         private void CustomInput(On.HeroController.orig_LookForInput orig, HeroController self)
         {
-            ReflectionHelper.SetField<HeroController, float>(self, "dash_timer", 0);
+            ReflectionHelper.SetAttr<HeroController, float>(self, "dash_timer", 0);
 
             orig(self);
 
@@ -67,11 +67,11 @@ namespace AnyRadiance.Radiance
             if (self.hero_state != ActorStates.no_input &&
                 self.hero_state != ActorStates.hard_landing &&
                 self.hero_state != ActorStates.dash_landing &&
-                ReflectionHelper.GetField<HeroController, float>(self, "dashCooldownTimer") <= 0 &&
+                ReflectionHelper.GetAttr<HeroController, float>(self, "dashCooldownTimer") <= 0 &&
                 !self.cState.dashing &&
                 !self.cState.backDashing &&
-                (!self.cState.attacking || !(ReflectionHelper.GetField<HeroController, float>(self, "attack_time") <
-                                             ReflectionHelper.GetField<HeroController, float>(self, "ATTACK_RECOVERY_TIME"))) &&
+                (!self.cState.attacking || !(ReflectionHelper.GetAttr<HeroController, float>(self, "attack_time") <
+                                             ReflectionHelper.GetAttr<HeroController, float>(self, "ATTACK_RECOVERY_TIME"))) &&
                 !self.cState.preventDash &&
                 !self.cState.hazardDeath &&
                 PlayerData.instance.GetBool("canDash"))

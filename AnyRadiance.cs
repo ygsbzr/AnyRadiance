@@ -10,7 +10,7 @@ using UObject = UnityEngine.Object;
 
 namespace AnyRadiance
 {
-    internal class AnyRadiance : Mod, ILocalSettings<LocalSettings>, IMenuMod
+    internal class AnyRadiance : Mod
     {
         internal static AnyRadiance Instance { get; private set; }
 
@@ -20,9 +20,7 @@ namespace AnyRadiance
 
         public static LocalSettings Settings = new();
 
-        public void OnLoadLocal(LocalSettings settings) => Settings = settings;
-
-        public LocalSettings OnSaveLocal() => Settings;
+        public override ModSettings SaveSettings { get => Settings; set => Settings = (LocalSettings)value; }
 
         public AnyRadiance() : base("Any Radiance") { }
 
@@ -36,13 +34,13 @@ namespace AnyRadiance
 
             LoadAssets();
 
-            ModHooks.BeforeSavegameSaveHook += BeforeSaveGameSave;
-            ModHooks.AfterSavegameLoadHook += SaveGame;
-            ModHooks.SavegameSaveHook += SaveGameSave;
-            ModHooks.NewGameHook += AddComponent;
-            ModHooks.LanguageGetHook += OnLangGet;
-            ModHooks.SetPlayerVariableHook += SetVariableHook;
-            ModHooks.GetPlayerVariableHook += GetVariableHook;
+            ModHooks.Instance.BeforeSavegameSaveHook += BeforeSaveGameSave;
+            ModHooks.Instance.AfterSavegameLoadHook += SaveGame;
+            ModHooks.Instance.SavegameSaveHook += SaveGameSave;
+            ModHooks.Instance.NewGameHook += AddComponent;
+            ModHooks.Instance.LanguageGetHook += OnLangGet;
+            ModHooks.Instance.SetPlayerVariableHook += SetVariableHook;
+            ModHooks.Instance.GetPlayerVariableHook += GetVariableHook;
         }
 
         private object SetVariableHook(Type t, string key, object obj)
@@ -64,7 +62,7 @@ namespace AnyRadiance
             return name == "statueStateAnyRad" ? Settings.Completion : orig;
         }
 
-        private string OnLangGet(string key, string sheetTitle, string orig)
+        private string OnLangGet(string key, string sheetTitle)
         {
             switch (key)
             {
@@ -72,16 +70,16 @@ namespace AnyRadiance
                     return PlayerData.instance.statueStateRadiance.usingAltVersion ||
                             Settings.InBossDoor && BossSequenceController.IsInSequence
                         ? "Any"
-                        : orig;
+                        : Language.Language.GetInternal(key,sheetTitle);
                 case "ANY_RAD_NAME":
                     return "Any Radiance";
                 case "ANY_RAD_DESC":
                     return "Why.";
                 case "GODSEEKER_ANYRAD_STATUE":
-                    return sheetTitle == "CP3" ? "k" : orig;
+                    return sheetTitle == "CP3" ? "k" : Language.Language.GetInternal(key, sheetTitle);
             }
 
-            return orig;
+            return Language.Language.GetInternal(key, sheetTitle);
         }
 
         private static void BeforeSaveGameSave(SaveGameData data)
@@ -95,7 +93,6 @@ namespace AnyRadiance
         {
             SaveGameSave();
             AddComponent();
-            RefreshMenu();
         }
 
         private static void SaveGameSave(int id = 0)
@@ -109,34 +106,7 @@ namespace AnyRadiance
             GameManager.instance.gameObject.AddComponent<SceneLoader>();
         }
 
-        public bool ToggleButtonInsideMenu => true;
 
-        public List<IMenuMod.MenuEntry> GetMenuData(IMenuMod.MenuEntry? menu)
-        {
-            return new List<IMenuMod.MenuEntry>
-            {
-                new()
-                {
-                    Name = "In Pantheon?",
-                    Description = "Choose whether Any Radiance shows up in the Pantheon of Hallownest.",
-                    Values = new[] { Language.Language.Get("MOH_ON", "MainMenu"), Language.Language.Get("MOH_OFF", "MainMenu") },
-                    Saver = ChooseEnter,
-                    Loader = () => Settings.InBossDoor ? 0 : 1
-                }
-            };
-        }
-
-        private static void ChooseEnter(int i) => Settings.InBossDoor = i == 0;
-
-        private void RefreshMenu()
-        {
-            MenuScreen menu = ModHooks.BuiltModMenuScreens[this];
-
-            foreach (var option in menu.gameObject.GetComponentsInChildren<MenuOptionHorizontal>())
-            {
-                option.menuSetting.RefreshValueFromGameSettings();
-            }
-        }
 
         private void LoadAssets()
         {
@@ -160,6 +130,11 @@ namespace AnyRadiance
                             GameObjects.Add(gameObject.name, gameObject);
                         }
                     }
+                    //else if (resourceName.Contains("truerad"))
+                    //{
+                    //    var bundle = AssetBundle.LoadFromStream(stream);
+                    //    Bundles.Add(bundle.name, bundle);
+                    //}
 
                     stream.Dispose();
                 }
@@ -168,12 +143,13 @@ namespace AnyRadiance
 
         public void Unload()
         {
-            ModHooks.BeforeSavegameSaveHook -= BeforeSaveGameSave;
-            ModHooks.AfterSavegameLoadHook -= SaveGame;
-            ModHooks.SavegameSaveHook -= SaveGameSave;
-            ModHooks.NewGameHook -= AddComponent;
-            ModHooks.LanguageGetHook -= OnLangGet;
-            ModHooks.SetPlayerVariableHook -= SetVariableHook;
+            ModHooks.Instance.BeforeSavegameSaveHook -= BeforeSaveGameSave;
+            ModHooks.Instance.AfterSavegameLoadHook -= SaveGame;
+            ModHooks.Instance.SavegameSaveHook -= SaveGameSave;
+            ModHooks.Instance.NewGameHook -= AddComponent;
+            ModHooks.Instance.LanguageGetHook -= OnLangGet;
+            ModHooks.Instance.SetPlayerVariableHook -= SetVariableHook;
+            ModHooks.Instance.GetPlayerVariableHook -= GetVariableHook;
 
             var finder = GameManager.instance.gameObject.GetComponent<RadianceFinder>();
 

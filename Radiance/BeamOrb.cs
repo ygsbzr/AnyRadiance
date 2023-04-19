@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vasi;
 using Random = UnityEngine.Random;
-
+using HKAIFramework;
 namespace AnyRadiance.Radiance
 {
     internal class BeamOrb : MonoBehaviour

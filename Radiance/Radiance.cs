@@ -4,7 +4,6 @@ using HKAIFramework;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using Modding;
-using Modding.Utils;
 using System;
 using System.Collections;
 using System.Linq;
@@ -153,7 +152,7 @@ namespace AnyRadiance.Radiance
 
         private readonly ActionSet _phase1Subphase1Actions = new()
         {
-            TrackedSequences = new Tuple<ActionSequence, float, int>[]
+            TrackedSequences = new ValueTuple<ActionSequence, float, int>[]
             {
                 new(_nailWalls, 0.5f, 2),
                 new(_laserColumns, 0.5f, 2),
@@ -162,7 +161,7 @@ namespace AnyRadiance.Radiance
 
         private readonly ActionSet _phase1Subphase2Actions = new()
         {
-            TrackedSequences = new Tuple<ActionSequence, float, int>[]
+            TrackedSequences = new ValueTuple<ActionSequence, float, int>[]
             {
                 new(_summonSplitterP1, 1.0f / 3, 2),
                 new(_summonBeamOrbP1, 1.0f / 3, 2),
@@ -171,7 +170,7 @@ namespace AnyRadiance.Radiance
 
         private readonly ActionSet _phase2Actions = new()
         {
-            TrackedSequences = new Tuple<ActionSequence, float, int>[]
+            TrackedSequences = new ValueTuple<ActionSequence, float, int>[]
             {
                 new(_summonSplitterP2, 0.5f, 2),
                 new(_nailBarrage, 0.5f, 2),
@@ -197,8 +196,8 @@ namespace AnyRadiance.Radiance
             _spellCtrl = _hc.gameObject.LocateMyFSM("Spell Control");
             var quake1Down = _spellCtrl.GetAction<CallMethodProper>("Quake1 Down");
             var quake2Down = _spellCtrl.GetAction<CallMethodProper>("Quake2 Down");
-            ReflectionHelper.SetField<FsmStateAction, bool>(quake1Down, "enabled", false);
-            ReflectionHelper.SetField<FsmStateAction, bool>(quake2Down, "enabled", false);
+            ReflectionHelper.SetAttr<FsmStateAction, bool>(quake1Down, "enabled", false);
+            ReflectionHelper.SetAttr<FsmStateAction, bool>(quake2Down, "enabled", false);
 
             foreach (var fsm in GetComponents<PlayMakerFSM>()) Destroy(fsm);
 
@@ -217,8 +216,8 @@ namespace AnyRadiance.Radiance
         {
             var quake1Down = _spellCtrl.GetAction<CallMethodProper>("Quake1 Down");
             var quake2Down = _spellCtrl.GetAction<CallMethodProper>("Quake2 Down");
-            ReflectionHelper.SetField<FsmStateAction, bool>(quake1Down, "enabled", true);
-            ReflectionHelper.SetField<FsmStateAction, bool>(quake2Down, "enabled", true);
+            ReflectionHelper.SetAttr<FsmStateAction, bool>(quake1Down, "enabled", true);
+            ReflectionHelper.SetAttr<FsmStateAction, bool>(quake2Down, "enabled", true);
 
             var knight = HeroController.instance.GetComponent<Knight>();
             if (knight != null) Destroy(knight);
@@ -681,7 +680,7 @@ namespace AnyRadiance.Radiance
             yield return TeleIn(new Vector3(60.63f, 28.3f, 0.006f));
 
             // Activate all spikes and make them stay up.
-            foreach (var fsm in FindObjectsOfType<PlayMakerFSM>(true)
+            foreach (var fsm in FindObjectsOfType<PlayMakerFSM>()
                          .Where(fsm => fsm.name.Contains("Radiant Spike")))
             {
                 if (fsm.FsmName == "Control")

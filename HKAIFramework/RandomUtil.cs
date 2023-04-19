@@ -21,7 +21,7 @@ namespace HKAIFramework
         /// <typeparam name="T">Type of the item</typeparam>
         /// <param name="list">List containing items and their weights and max number of repeats</param>
         /// <returns></returns>
-        public static T WeightedRandom<T>(Tuple<T, float, int>[] list)
+        public static T WeightedRandom<T>(ValueTuple<T, float, int>[] list)
         {
             var items = new List<T>();
             foreach ((T item, float weight, int maxRepeats) in list)
