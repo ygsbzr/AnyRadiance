@@ -32,7 +32,6 @@ namespace AnyRadiance
             
             Unload();
 
-            LoadAssets();
 
             ModHooks.Instance.BeforeSavegameSaveHook += BeforeSaveGameSave;
             ModHooks.Instance.AfterSavegameLoadHook += SaveGame;
@@ -41,6 +40,7 @@ namespace AnyRadiance
             ModHooks.Instance.LanguageGetHook += OnLangGet;
             ModHooks.Instance.SetPlayerVariableHook += SetVariableHook;
             ModHooks.Instance.GetPlayerVariableHook += GetVariableHook;
+            LoadAssets();
         }
 
         private object SetVariableHook(Type t, string key, object obj)
@@ -110,24 +110,55 @@ namespace AnyRadiance
 
         private void LoadAssets()
         {
-            var assembly = Assembly.GetExecutingAssembly();
+            string bundlename= "anyradwin";
+            switch (SystemInfo.operatingSystemFamily)
+            {
+                case OperatingSystemFamily.Windows:
+                    bundlename = "anyradwin";
+                    break;
+                case OperatingSystemFamily.Linux:
+                    bundlename = "anyradlin";
+                    break;
+                case OperatingSystemFamily.MacOSX:
+                    bundlename = "anyradmac";
+                    break;
+                default:
+                    Log("ERROR UNSUPPORTED SYSTEM: " + SystemInfo.operatingSystemFamily);
+                    return;
+            }
+           Assembly assembly = Assembly.GetExecutingAssembly();
             foreach (string resourceName in assembly.GetManifestResourceNames())
             {
+                Log(resourceName);
                 using (Stream stream = assembly.GetManifestResourceStream(resourceName))
                 {
                     if (stream == null) continue;
 
-                    if (resourceName.Contains("anyrad"))
+                    if (resourceName.Contains(bundlename))
                     {
-                        var bundle = AssetBundle.LoadFromStream(stream);
-                        foreach (var clip in bundle.LoadAllAssets<AudioClip>())
+                        Log("Loading bundle: " + bundlename);
+                        byte[] buffer=new byte[stream.Length];
+                        stream.Read(buffer, 0, buffer.Length);
+                        AssetBundle bundle = AssetBundle.LoadFromMemory(buffer);
+                        stream.Dispose();
+            
+                        
+ 
+                        if (bundle == null)
                         {
-                            AudioClips.Add(clip.name, clip);
+                            Log("Bundle is null");
                         }
-
-                        foreach (var gameObject in bundle.LoadAllAssets<GameObject>())
+                       if(bundle != null)
                         {
-                            GameObjects.Add(gameObject.name, gameObject);
+                            foreach (var clip in bundle.LoadAllAssets<AudioClip>())
+                            {
+                                AudioClips.Add(clip.name, clip);
+                            }
+
+                            foreach (var gameObject in bundle.LoadAllAssets<GameObject>())
+                            {
+                                GameObjects.Add(gameObject.name, gameObject);
+                            }
                         }
                     }
                     //else if (resourceName.Contains("truerad"))
@@ -136,7 +167,6 @@ namespace AnyRadiance
                     //    Bundles.Add(bundle.name, bundle);
                     //}
 
-                    stream.Dispose();
                 }
             }
         }

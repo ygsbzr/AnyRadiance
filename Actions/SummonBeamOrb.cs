@@ -39,13 +39,10 @@ namespace AnyRadiance.Radiance.Actions
                 Random.Range(ArenaInfo.CurrentLeft, ArenaInfo.CurrentRight),
                 Random.Range(ArenaInfo.CurrentBottom + 2, ArenaInfo.CurrentTop - 21),
                 0);
-
             AnyRadiance.Instance.GameObjects["Shot Charge"].transform.position = spawnPos;
             AnyRadiance.Instance.GameObjects["Shot Charge"].GetComponent<ParticleSystem>().Play();
             AnyRadiance.Instance.AudioClips["Ghost"].PlayOneShot(transform.position);
-
             yield return null;
-
             GameObject orb = AnyRadiance.Instance.GameObjects["Orb"].Spawn(spawnPos);
             orb.name = "Beam Orb";
             var orbComponent = orb.AddComponent<BeamOrb>();

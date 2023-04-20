@@ -36,7 +36,7 @@ namespace AnyRadiance.Radiance.Actions
                 return ultraOrb.transform.localScale.x >= _killScale;
             });
 
-            AnyRadiance.Instance.AudioClips["Final Hit"].PlayOneShot(HeroController.instance.transform.position);
+            AnyRadiance.Instance.AudioClips["Final Hit 2"].PlayOneShot(HeroController.instance.transform.position);
             iTween.FadeTo(AnyRadiance.Instance.GameObjects["White Fader"], 1, 0.25f);
             yield return new WaitForSeconds(1);
             var heroController = HeroController.instance;

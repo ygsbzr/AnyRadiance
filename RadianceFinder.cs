@@ -80,19 +80,18 @@ namespace AnyRadiance
         private IEnumerator AddComponent()
         {
             yield return null;
-
-             FindObjectsOfType<GameObject>().FirstOrDefault(go =>
-                go.name == "Absolute Radiance" && go.layer == (int)PhysLayers.ENEMIES)?
-                .AddComponent<Radiance.Radiance>();
-
             // Replace standard Radiance theme with metal remix
             var applyMusicCue = GameObject.Find("Boss Control").LocateMyFSM("Control")
                 .GetAction<ApplyMusicCue>("Title Up");
             var musicCue = applyMusicCue.musicCue.Value as MusicCue;
-            var channelInfos =ReflectionHelper.GetAttr<MusicCue, MusicCue.MusicChannelInfo[]>(musicCue, "channelInfos");
+            var channelInfos = ReflectionHelper.GetAttr<MusicCue, MusicCue.MusicChannelInfo[]>(musicCue, "channelInfos");
             ReflectionHelper.SetAttr(channelInfos[0], "clip", AnyRadiance.Instance.AudioClips["Music"]);
             ReflectionHelper.SetAttr(musicCue, "channelInfos", channelInfos);
             applyMusicCue.musicCue = musicCue;
+            yield return new WaitUntil(() => GameObject.Find("Absolute Radiance") != null);
+             GameObject.Find("Absolute Radiance").AddComponent<Radiance.Radiance>();
+
+           
         }
     }
 }
