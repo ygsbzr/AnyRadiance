@@ -112,7 +112,7 @@ namespace AnyRadiance.Radiance
         public IEnumerator Close()
         {
             if (_portalState == PortalState.Closed) yield break;
-            _animator.Play("Close");
+             _animator.Play("Close");
             yield return new WaitUntil(() => _animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1);
             _portalState = PortalState.Closed;
         }

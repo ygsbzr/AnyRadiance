@@ -16,18 +16,12 @@ namespace AnyRadiance.Radiance
 
         private const float MinTimeBetweenPortalPositionRandomization = 10000;
         private const float MaxTimeBetweenPortalPositionRandomization = 12000;
-        private Timer _randomizePortalPositionsTimer;
+        //private Timer _randomizePortalPositionsTimer;
 
         private List<GameObject> _doNotTeleport;
 
         private void Awake()
         {
-            _randomizePortalPositionsTimer = new Timer(Random.Range(MinTimeBetweenPortalPositionRandomization,
-                MaxTimeBetweenPortalPositionRandomization))
-            {
-                AutoReset = true
-            };
-            _randomizePortalPositionsTimer.Start();
 
             _doNotTeleport = new List<GameObject>();
 
@@ -37,15 +31,19 @@ namespace AnyRadiance.Radiance
             _portal1.OnEnterPortal += OnEnterPortal1;
             _portal2.OnEnterPortal += OnEnterPortal2;
 
-            StartCoroutine(RandomizePortalPositions());
-            _randomizePortalPositionsTimer.Elapsed += (_, _) =>
-            {
-                _randomizePortalPositionsTimer.Interval = Random.Range(MinTimeBetweenPortalPositionRandomization,
-                    MaxTimeBetweenPortalPositionRandomization);
-                StartCoroutine(RandomizePortalPositions());
-            };
+            StartCoroutine(TimerCorutine());
         }
-
+        private IEnumerator TimerCorutine()
+        {
+            StartCoroutine(RandomizePortalPositions());
+            yield return RandomizePortalPositions();
+            while (true)
+            {
+                yield return new WaitForSeconds(Random.Range(MinTimeBetweenPortalPositionRandomization,
+                    MaxTimeBetweenPortalPositionRandomization)/1000);
+                StartCoroutine(RandomizePortalPositions());
+            }
+        }
         /// <summary>
         /// Triggered when a game object enters the first portal.
         /// </summary>
